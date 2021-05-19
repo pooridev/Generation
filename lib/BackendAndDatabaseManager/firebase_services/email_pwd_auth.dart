@@ -10,8 +10,8 @@ import 'package:generation_official/FrontEnd/Auth_UI/log_in_UI.dart';
 import 'package:generation_official/FrontEnd/MainScreen/MainWindow.dart';
 
 class EmailAndPasswordAuth {
-  String _email, _pwd;
-  BuildContext _context;
+  String? _email, _pwd;
+  final BuildContext _context;
 
   final GlobalKey<FormState> _userNameKey = GlobalKey<FormState>();
   final LocalStorageHelper _localStorageHelper = LocalStorageHelper();
@@ -19,7 +19,7 @@ class EmailAndPasswordAuth {
   TextEditingController _userName = TextEditingController();
   TextEditingController _about = TextEditingController();
 
-  EmailAndPasswordAuth([this._context, this._email, this._pwd]) {
+  EmailAndPasswordAuth(this._context,[ this._email, this._pwd]) {
     //Close the keyboard
     SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
@@ -28,8 +28,8 @@ class EmailAndPasswordAuth {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
-              email: this._email, password: this._pwd);
-      userCredential.user.sendEmailVerification();
+              email: this._email.toString(), password: this._pwd.toString());
+      userCredential.user!.sendEmailVerification();
 
       FirebaseAuth.instance.signOut();
 
@@ -62,11 +62,11 @@ class EmailAndPasswordAuth {
   Future<void> logIn() async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: this._email, password: this._pwd);
+          .signInWithEmailAndPassword(email: this._email.toString(), password: this._pwd.toString());
 
-      if (userCredential.user.emailVerified) {
+      if (userCredential.user!.emailVerified) {
         DocumentSnapshot responseData = await FirebaseFirestore.instance
-            .doc("generation_users/${userCredential.user.email}")
+            .doc("generation_users/${userCredential.user!.email}")
             .get();
 
         print(responseData.exists);
@@ -154,7 +154,7 @@ class EmailAndPasswordAuth {
                         controller: _userName,
                         style: TextStyle(color: Colors.white),
                         validator: (inputUserName) {
-                          if (inputUserName.length < 6)
+                          if (inputUserName!.length < 6)
                             return "User Name At Least 6 Characters";
                           else if (inputUserName.contains(' ') ||
                               inputUserName.contains('@'))
@@ -178,7 +178,7 @@ class EmailAndPasswordAuth {
                         controller: _about,
                         style: TextStyle(color: Colors.white),
                         validator: (inputUserName) {
-                          if (inputUserName.length < 6)
+                          if (inputUserName!.length < 6)
                             return "About Should be At Least 6 Characters";
                           return null;
                         },
@@ -207,7 +207,7 @@ class EmailAndPasswordAuth {
                                 TextStyle(fontSize: 18.0, color: Colors.white),
                           ),
                           onPressed: () async {
-                            if (_userNameKey.currentState.validate()) {
+                            if (_userNameKey.currentState!.validate()) {
                               print("ok");
 
                               QuerySnapshot querySnapShotForUserNameChecking =
@@ -221,7 +221,7 @@ class EmailAndPasswordAuth {
 
                               if (querySnapShotForUserNameChecking
                                   .docs.isEmpty) {
-                                final String _getToken =
+                                final String? _getToken =
                                     await FirebaseMessaging.instance.getToken();
 
                                 FirebaseFirestore.instance
@@ -247,7 +247,7 @@ class EmailAndPasswordAuth {
                                 await _localStorageHelper
                                     .insertDataForThisAccount(
                                   userMail:
-                                      FirebaseAuth.instance.currentUser.email,
+                                      FirebaseAuth.instance.currentUser!.email,
                                   userName: this._userName.text,
                                   userToken: _getToken,
                                 );

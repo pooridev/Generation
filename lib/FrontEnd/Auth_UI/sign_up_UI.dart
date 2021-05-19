@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:generation_official/BackendAndDatabaseManager/firebase_services/email_pwd_auth.dart';
 import 'package:generation_official/BackendAndDatabaseManager/firebase_services/google_auth.dart';
 
 import 'package:generation_official/FrontEnd/Auth_UI/log_in_UI.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 
 class SignUpAuthentication extends StatefulWidget {
@@ -14,13 +16,13 @@ class SignUpAuthentication extends StatefulWidget {
 
 class _SignUpAuthenticationState extends State<SignUpAuthentication> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  bool _pwdShowPermission, _confirmPwdShowPermission;
+  late bool _pwdShowPermission, _confirmPwdShowPermission;
 
-  bool _progressPermission;
+  late bool _progressPermission;
 
-  TextEditingController _email;
-  TextEditingController _pwd;
-  TextEditingController _confirmPwd;
+  late TextEditingController _email;
+  late TextEditingController _pwd;
+  late TextEditingController _confirmPwd;
 
   @override
   void initState() {
@@ -94,7 +96,7 @@ class _SignUpAuthenticationState extends State<SignUpAuthentication> {
                           validator: (inputValue) {
                             RegExp _emailRegex = RegExp(
                                 r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
-                            if (_emailRegex.hasMatch(inputValue)) {
+                            if (_emailRegex.hasMatch(inputValue!)) {
                               return null;
                             }
                             return "Enter Valid Email";
@@ -144,7 +146,7 @@ class _SignUpAuthenticationState extends State<SignUpAuthentication> {
                               ),
                             ),
                             validator: (inputValue) {
-                              if ((inputValue.length >= 8)) {
+                              if ((inputValue!.length >= 8)) {
                                 return null;
                               }
                               return "Password should be more than or equal to 8 characters";
@@ -193,7 +195,7 @@ class _SignUpAuthenticationState extends State<SignUpAuthentication> {
                               ),
                             ),
                             validator: (inputValue) {
-                              if ((inputValue.length < 8)) {
+                              if ((inputValue!.length < 8)) {
                                 return "Password should be more than or equal to 8 characters";
                               } else if (this._confirmPwd.text !=
                                   this._pwd.text)
@@ -229,7 +231,7 @@ class _SignUpAuthenticationState extends State<SignUpAuthentication> {
                           ),
                         ),
                         onPressed: () async {
-                          if (_formKey.currentState.validate()) {
+                          if (_formKey.currentState!.validate()) {
                             print("Proceed with Sign-Up");
                             setState(() {
                               _progressPermission = true;

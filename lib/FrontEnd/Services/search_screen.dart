@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'package:generation_official/BackendAndDatabaseManager/general_services/notification_configuration.dart';
 
 class Search extends StatefulWidget {
@@ -12,11 +13,11 @@ class Search extends StatefulWidget {
 class _SearchState extends State<Search> {
   Icon _iconSample = Icon(Icons.filter_list_rounded);
 
-  String searchArgument;
+  late String searchArgument;
 
   final SendNotification _sendNotification = SendNotification();
   final TextEditingController searchUser = TextEditingController();
-  QuerySnapshot searchResultSnapshot;
+  late QuerySnapshot searchResultSnapshot;
 
   bool isLoading = false;
   bool haveUserSearched = false;
@@ -59,7 +60,7 @@ class _SearchState extends State<Search> {
             itemBuilder: (context, index) {
               print(searchResultSnapshot.docs[index]);
               if (searchResultSnapshot.docs[index].id ==
-                  FirebaseAuth.instance.currentUser.email) {
+                  FirebaseAuth.instance.currentUser!.email) {
                 return SizedBox();
               }
               return userTile(index);
@@ -114,7 +115,7 @@ class _SearchState extends State<Search> {
               DocumentSnapshot documentSnapShotCurrUser =
                   await FirebaseFirestore.instance
                       .collection('generation_users')
-                      .doc(FirebaseAuth.instance.currentUser.email)
+                      .doc(FirebaseAuth.instance.currentUser!.email)
                       .get();
 
               Map<String, dynamic> connectionRequestCollectionCurrUser =
@@ -130,7 +131,7 @@ class _SearchState extends State<Search> {
                 });
 
                 connectionRequestCollectionRequestUser.addAll({
-                  '${FirebaseAuth.instance.currentUser.email}':
+                  '${FirebaseAuth.instance.currentUser!.email}':
                       "Invitation Came",
                 });
 
@@ -146,7 +147,7 @@ class _SearchState extends State<Search> {
 
                     FirebaseFirestore.instance
                         .doc(
-                            'generation_users/${FirebaseAuth.instance.currentUser.email}')
+                            'generation_users/${FirebaseAuth.instance.currentUser!.email}')
                         .update({
                       'connection_request': connectionRequestCollectionCurrUser,
                     });
@@ -164,7 +165,7 @@ class _SearchState extends State<Search> {
                 print("Updated");
               } else {
                 if (searchResultSnapshot.docs[index]['connection_request']
-                        [FirebaseAuth.instance.currentUser.email] ==
+                        [FirebaseAuth.instance.currentUser!.email] ==
                     "Request Pending") {
                   Map<String, dynamic> connectionsMapRequestUser =
                       searchResultSnapshot.docs[index]['connections'];
@@ -178,13 +179,13 @@ class _SearchState extends State<Search> {
                   });
 
                   connectionRequestCollectionRequestUser.addAll({
-                    '${FirebaseAuth.instance.currentUser.email}':
+                    '${FirebaseAuth.instance.currentUser!.email}':
                         "Request Accepted",
                   });
                   print("Add Invited User Data to SQLite");
 
                   connectionsMapRequestUser.addAll({
-                    '${FirebaseAuth.instance.currentUser.email}': [],
+                    '${FirebaseAuth.instance.currentUser!.email}': [],
                   });
 
                   connectionsMapCurrUser.addAll({
@@ -210,7 +211,7 @@ class _SearchState extends State<Search> {
 
                       FirebaseFirestore.instance
                           .doc(
-                              'generation_users/${FirebaseAuth.instance.currentUser.email}')
+                              'generation_users/${FirebaseAuth.instance.currentUser!.email}')
                           .update({
                         'connection_request':
                             connectionRequestCollectionCurrUser,
@@ -389,7 +390,7 @@ class _SearchState extends State<Search> {
 
   Widget requestIconController(int index) {
     if (!searchResultSnapshot.docs[index]['connection_request']
-        .containsKey('${FirebaseAuth.instance.currentUser.email}')) {
+        .containsKey('${FirebaseAuth.instance.currentUser!.email}')) {
       return Icon(
         Icons.person_add_alt,
         size: 30.0,
@@ -398,7 +399,7 @@ class _SearchState extends State<Search> {
     }
 
     String oppositeConnectionStatus = searchResultSnapshot.docs[index]
-        .data()['connection_request'][FirebaseAuth.instance.currentUser.email];
+        .data()['connection_request'][FirebaseAuth.instance.currentUser!.email];
 
     if (oppositeConnectionStatus == 'Invitation Came') {
       return Icon(

@@ -7,8 +7,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:generation_official/FrontEnd/Preview/images_preview_screen.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:animations/animations.dart';
 import 'package:path_provider/path_provider.dart';
@@ -40,7 +42,7 @@ class _ChatsAndActivityCollectionState
 
   final List<String> _allUserConnectionActivity = [];
 
-  String _thisAccountUserNameIs;
+  late String _thisAccountUserNameIs;
 
   /// For FireStore Management Purpose
   final Management _management = Management();
@@ -69,19 +71,19 @@ class _ChatsAndActivityCollectionState
 
     /// Listen to the realTime Data Fetch
     _management.getDatabaseData().listen((event) async {
-      final Map<String, dynamic> _allUserConnectionActivityTake =
-          event.data()['activity'] as Map;
+      final Map _allUserConnectionActivityTake =
+          event.data()!['activity'] as Map;
 
       /// Current Account User Name Take
-      final String _thisAccountUserName =
+      final String? _thisAccountUserName =
           await _localStorageHelper.extractImportantDataFromThatAccount(
-              userMail: FirebaseAuth.instance.currentUser.email);
+              userMail: FirebaseAuth.instance.currentUser!.email);
 
       /// Checking Already This Account Name Present in Local Container or not
       if (!_allUserConnectionActivity.contains(_thisAccountUserName)) {
         if (mounted) {
           setState(() {
-            _allUserConnectionActivity.add(_thisAccountUserName);
+            _allUserConnectionActivity.add(_thisAccountUserName!);
           });
         }
       }
@@ -96,7 +98,7 @@ class _ChatsAndActivityCollectionState
           final List<dynamic> particularConnectionActivity =
               _allUserConnectionActivityTake[connectionMail] as List;
 
-          final String _connectionUserNameFromLocalDatabase =
+          final String? _connectionUserNameFromLocalDatabase =
               await _localStorageHelper.extractImportantDataFromThatAccount(
                   userMail:
                       connectionMail); // FindOut User Name from local database
@@ -107,7 +109,7 @@ class _ChatsAndActivityCollectionState
             if (mounted) {
               setState(() {
                 _allUserConnectionActivity
-                    .add(_connectionUserNameFromLocalDatabase);
+                    .add(_connectionUserNameFromLocalDatabase!);
               });
             }
           }
@@ -119,7 +121,7 @@ class _ChatsAndActivityCollectionState
 
               FirebaseFirestore.instance
                   .doc(
-                      'generation_users/${FirebaseAuth.instance.currentUser.email}')
+                      'generation_users/${FirebaseAuth.instance.currentUser!.email}')
                   .update({
                 'activity': _allUserConnectionActivityTake,
               });
@@ -128,7 +130,7 @@ class _ChatsAndActivityCollectionState
 
           particularConnectionActivity.forEach((everyActivity) async {
             if (_mediaRegex.hasMatch(everyActivity.keys.first.toString())) {
-              final Directory directory = await getExternalStorageDirectory();
+              final Directory? directory = await getExternalStorageDirectory();
 
               final String currTime = DateTime.now().toString();
 
@@ -136,7 +138,7 @@ class _ChatsAndActivityCollectionState
                   'video') {
                 if (storagePermissionStatus.isGranted) {
                   final activityVideoPath =
-                      await Directory(directory.path + '/.ActivityVideos/')
+                      await Directory(directory!.path + '/.ActivityVideos/')
                           .create();
 
                   await _dio
@@ -171,7 +173,7 @@ class _ChatsAndActivityCollectionState
                 if (storagePermissionStatus.isGranted) {
                   /// Create new Hidden Folder once in desired location
                   final activityImagePath =
-                      await Directory('${directory.path}/.ActivityImages/')
+                      await Directory('${directory!.path}/.ActivityImages/')
                           .create();
 
                   /// Download Image Activity from Firebase Storage and store in local database
@@ -237,10 +239,10 @@ class _ChatsAndActivityCollectionState
       });
 
       /// Connection Request Processing
-      if (event.data()['connection_request'].length > 0) {
+      if (event.data()!['connection_request'].length > 0) {
         if (mounted) {
           final Map<String, Object> allConnectionRequest =
-              event.data()['connection_request']; // Take All Connection Request
+              event.data()!['connection_request']; // Take All Connection Request
 
           /// Take all Connection Request Data to Update Connectivity
           allConnectionRequest
@@ -293,11 +295,11 @@ class _ChatsAndActivityCollectionState
 
               /// User Latest Data Fetch
               final Map<String, dynamic> _allActiveConnections =
-                  event.data()['connections'];
+                  event.data()!['connections'];
 
               /// For Every Connection, Latest Data to Show
               _allConnectionsUserName.forEach((everyUserName) async {
-                final String _connectionMail = await _localStorageHelper
+                final String? _connectionMail = await _localStorageHelper
                     .extractImportantDataFromThatAccount(
                         userName: everyUserName);
 
@@ -306,13 +308,12 @@ class _ChatsAndActivityCollectionState
 
                 final List<Map<String, String>> _lastMessage = [];
 
-                if (_allRemainingMessages == null ||
-                    _allRemainingMessages.length == 0) {
-                  final Map<String, String> takeLocalData =
+                if (_allRemainingMessages.length == 0) {
+                  final Map<String, String>? takeLocalData =
                       await _localStorageHelper
                           .fetchLatestMessage(everyUserName);
 
-                  _lastMessage.add(takeLocalData);
+                  _lastMessage.add(takeLocalData!);
                 } else {
                   _allRemainingMessages.forEach((everyMessage) {
                     _lastMessage.add({
@@ -355,15 +356,15 @@ class _ChatsAndActivityCollectionState
         await _localStorageHelper.extractAllUsersName();
     _alreadyStoredUserNameList.forEach((userNameMap) async {
       final int _countTotalActivity = await _localStorageHelper
-          .countTotalActivitiesForParticularUserName(userNameMap.values.first);
+          .countTotalActivitiesForParticularUserName(userNameMap.values.first.toString());
       if (_countTotalActivity > 0) {
         if (!_allUserConnectionActivity.contains(userNameMap.values.first)) {
           if (mounted) {
             setState(() {
               if (userNameMap.values.first == this._thisAccountUserNameIs)
-                _allUserConnectionActivity.insert(0, userNameMap.values.first);
+                _allUserConnectionActivity.insert(0, userNameMap.values.first.toString());
               else
-                _allUserConnectionActivity.add(userNameMap.values.first);
+                _allUserConnectionActivity.add(userNameMap.values.first.toString());
             });
           }
         }
@@ -373,8 +374,8 @@ class _ChatsAndActivityCollectionState
 
   void _fetchThisAccountUserName() async {
     this._thisAccountUserNameIs =
-        await _localStorageHelper.extractImportantDataFromThatAccount(
-            userMail: FirebaseAuth.instance.currentUser.email);
+        (await _localStorageHelper.extractImportantDataFromThatAccount(
+            userMail: FirebaseAuth.instance.currentUser!.email))!;
   }
 
   @override
@@ -675,8 +676,8 @@ class _ChatsAndActivityCollectionState
                     // Irrespectively make changes when a chat just Close
                     _localStorageHelper
                         .fetchLatestMessage(_userName)
-                        .then((Map<String, String> takeLocalData) {
-                      if (takeLocalData.values.toString().split('+')[0] != '') {
+                        .then((Map<String, String>? takeLocalData) {
+                      if (takeLocalData!.values.toString().split('+')[0] != '') {
                         _allConnectionsLatestMessage[_userName].clear();
                         if (mounted) {
                           setState(() {
@@ -757,7 +758,7 @@ class _ChatsAndActivityCollectionState
         _allConnectionsLatestMessage[_userName] as List<Map<String, String>>;
 
     /// Extract UserName Specific Messages from temp storage
-    if (_allLatestMessages != null && _allLatestMessages.length > 0) {
+    if (_allLatestMessages.length > 0) {
       final Map<String, String> _lastMessage = _allLatestMessages.last;
 
       /// For Extract Last Conversation Time
@@ -766,25 +767,18 @@ class _ChatsAndActivityCollectionState
       }
 
       /// For Extract Last Conversation Message
-      if (_lastMessage != null) {
-        String _mediaType = _lastMessage.values.last.toString().split('+')[1];
-        String _remainingMessagesLength = '';
+      String _mediaType = _lastMessage.values.last.toString().split('+')[1];
+      String _remainingMessagesLength = '';
 
-        /// If Last Message Not From Local Database
-        if (_lastMessage.values.last.toString().split('+').length != 3 ||
-            _lastMessage.values.last.toString().split('+')[2] != 'localDb')
-          _remainingMessagesLength = _allLatestMessages.length.toString();
+      /// If Last Message Not From Local Database
+      if (_lastMessage.values.last.toString().split('+').length != 3 ||
+          _lastMessage.values.last.toString().split('+')[2] != 'localDb')
+        _remainingMessagesLength = _allLatestMessages.length.toString();
 
-        /// After Filtering Extract Latest Message and Return Message Widget
-        return _latestMessageTypeExtract(_lastMessage.keys.last.toString(),
-            _mediaType, _remainingMessagesLength);
-      }
+      /// After Filtering Extract Latest Message and Return Message Widget
+      return _latestMessageTypeExtract(_lastMessage.keys.last.toString(),
+          _mediaType, _remainingMessagesLength);
 
-      /// If there is no last message
-      return Text(
-        'No Messages',
-        style: TextStyle(color: Colors.red),
-      );
     }
 
     /// For Extract Last Connection Time
@@ -807,7 +801,6 @@ class _ChatsAndActivityCollectionState
     switch (_mediaTypesToString) {
       case 'MediaTypes.Text':
         bool _blankMsgIndicator = false;
-        bool _onlyEmoji = false;
 
         final List<String> splitMsg = _message.split('\n');
 
@@ -815,7 +808,7 @@ class _ChatsAndActivityCollectionState
           splitMsg.remove('');
         }
 
-        if (splitMsg == null || splitMsg.length == 0) {
+        if (splitMsg.length == 0) {
           _message = 'Blank Message';
           _blankMsgIndicator = true;
         } else
@@ -842,14 +835,14 @@ class _ChatsAndActivityCollectionState
           children: [
             Expanded(
               child: Text(
-                _message ??= 'Error',
+                _message,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16.0,
                   color: _blankMsgIndicator
                       ? Colors.redAccent
                       : const Color.fromRGBO(150, 150, 150, 1),
-                  fontFamily: _onlyEmoji ? 'Apple Color Emoji' : 'Arial',
+                  fontFamily: 'Arial',
                 ),
               ),
             ),
@@ -997,8 +990,7 @@ class _ChatsAndActivityCollectionState
   /// Extract last Conversation Message
   Widget _latestConversationTime(Map<String, String> _lastMessage) {
     String _willReturnTime = '';
-    if (_lastMessage != null &&
-        _lastMessage.values.last.toString().split('+')[0].toString() != '') {
+    if (_lastMessage.values.last.toString().split('+')[0].toString() != '') {
       _willReturnTime =
           _lastMessage.values.last.toString().split('+')[0].toString();
 

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:polls/polls.dart';
 
 class PollsMaker extends StatefulWidget {
-  const PollsMaker({Key key}) : super(key: key);
+  const PollsMaker({required Key key}) : super(key: key);
 
   @override
   _PollsMakerState createState() => _PollsMakerState();

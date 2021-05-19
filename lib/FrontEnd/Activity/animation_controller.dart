@@ -8,10 +8,10 @@ class AnimatedBar extends StatelessWidget {
   final int currentIndex;
 
   const AnimatedBar({
-    Key key,
-    @required this.animController,
-    @required this.position,
-    @required this.currentIndex,
+    Key? key,
+    required this.animController,
+    required this.position,
+    required this.currentIndex,
   }) : super(key: key);
 
   @override
@@ -24,7 +24,7 @@ class AnimatedBar extends StatelessWidget {
             children: <Widget>[
               _buildLoadingContainer(
                 double.infinity,
-                position < currentIndex
+                color: position < currentIndex
                     ? Colors.lightGreenAccent
                     : Colors.white,
               ),
@@ -34,7 +34,6 @@ class AnimatedBar extends StatelessWidget {
                       builder: (context, child) {
                         return _buildLoadingContainer(
                           constraints.maxWidth * animController.value,
-                          null,
                           linearGradient: LinearGradient(colors: [
                             Colors.redAccent,
                             Colors.lightGreenAccent,
@@ -50,8 +49,8 @@ class AnimatedBar extends StatelessWidget {
     );
   }
 
-  Container _buildLoadingContainer(double width, Color color,
-      {LinearGradient linearGradient}) {
+  Container _buildLoadingContainer(double width, {Color? color,
+      LinearGradient? linearGradient}) {
     return Container(
       height: 5.0,
       width: width,

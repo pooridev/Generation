@@ -1,24 +1,21 @@
 import 'dart:convert';
 
 import 'package:generation_official/BackendAndDatabaseManager/Dataset/data_type.dart';
-import 'package:generation_official/main.dart';
 import 'package:http/http.dart';
-
-import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class SendNotification {
-  Future<void> messageNotificationClassifier(MediaTypes mediaTypes,
+  Future<void> messageNotificationClassifier(MediaTypes? mediaTypes,
       {String textMsg = '',
-      @required String connectionToken,
-      @required String currAccountUserName}) async {
+      required String? connectionToken,
+      required String? currAccountUserName}) async {
     print('Token is: $connectionToken');
 
+    // ignore: missing_enum_constant_in_switch
     switch (mediaTypes) {
       case MediaTypes.Text:
         await sendNotification(
-          token: connectionToken,
+          token: connectionToken.toString(),
           title: "$currAccountUserName Send You a Message",
           body: textMsg,
         );
@@ -26,7 +23,7 @@ class SendNotification {
 
       case MediaTypes.Voice:
         await sendNotification(
-          token: connectionToken,
+          token: connectionToken.toString(),
           title: "$currAccountUserName Send You a Voice",
           body: '',
         );
@@ -34,7 +31,7 @@ class SendNotification {
 
       case MediaTypes.Image:
         await sendNotification(
-          token: connectionToken,
+          token: connectionToken.toString(),
           title: "$currAccountUserName Send You a Image",
           body: textMsg,
         );
@@ -42,7 +39,7 @@ class SendNotification {
 
       case MediaTypes.Video:
         await sendNotification(
-          token: connectionToken,
+          token: connectionToken.toString(),
           title: "$currAccountUserName Send You a Video",
           body: textMsg,
         );
@@ -50,7 +47,7 @@ class SendNotification {
 
       case MediaTypes.Sticker:
         await sendNotification(
-          token: connectionToken,
+          token: connectionToken.toString(),
           title: "$currAccountUserName Send You a Sticker",
           body: '',
         );
@@ -58,7 +55,7 @@ class SendNotification {
 
       case MediaTypes.Location:
         await sendNotification(
-          token: connectionToken,
+          token: connectionToken.toString(),
           title: "$currAccountUserName Send You Device Location",
           body: textMsg,
         );
@@ -66,7 +63,7 @@ class SendNotification {
 
       case MediaTypes.Document:
         await sendNotification(
-          token: connectionToken,
+          token: connectionToken.toString(),
           title: "$currAccountUserName Send You a Document",
           body: textMsg,
         );
@@ -78,9 +75,9 @@ class SendNotification {
   }
 
   Future<int> sendNotification(
-      {@required String token,
-      @required String title,
-      @required String body}) async {
+      {required String token,
+      required String title,
+      required String body}) async {
     try {
       print('Send');
 
@@ -113,12 +110,7 @@ class SendNotification {
 
       return response.statusCode;
     } catch (e) {
-      showDialog(
-          context: navigatorKey.currentContext,
-          builder: (_) => AlertDialog(
-                title: Text('Send Notification Error'),
-                content: Text(e.toString()),
-              ));
+      print(' Send Notification Error : ${e.toString()}');
 
       return 404;
     }
@@ -141,15 +133,15 @@ class ForeGroundNotificationReceiveAndShow {
   }
 
   initAll(InitializationSettings initializationSettings) async {
-    var response = await _flutterLocalNotificationsPlugin.initialize(
+    Future<bool?> response = (await _flutterLocalNotificationsPlugin.initialize(
         initializationSettings,
-        onSelectNotification: notificationSelected);
+        onSelectNotification: notificationSelected)) as Future<bool?>;
 
     print('Local Notification Initialization Status: $response');
   }
 
   Future<void> showNotification(
-      {@required String title, @required String body}) async {
+      {required String? title, required String? body}) async {
     try {
       final AndroidNotificationDetails androidDetails =
           AndroidNotificationDetails(
@@ -162,17 +154,11 @@ class ForeGroundNotificationReceiveAndShow {
       await _flutterLocalNotificationsPlugin
           .show(0, title, body, generalNotificationDetails, payload: title);
     } catch (e) {
-      showDialog(
-        context: navigatorKey.currentContext,
-        builder: (_) => AlertDialog(
-          title: Text('Show Notification Error'),
-          content: Text(e.toString()),
-        ),
-      );
+      print('Show Notification Error: ${e.toString()}');
     }
   }
 
-  Future notificationSelected(String payload) async {
+  Future notificationSelected(String? payload) async {
     print('On Select Notification Payload: $payload');
   }
 }

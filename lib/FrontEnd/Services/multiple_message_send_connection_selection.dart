@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:generation_official/BackendAndDatabaseManager/general_services/toast_message_manage.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:path_provider/path_provider.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:thumbnails/thumbnails.dart';
 
 import 'package:generation_official/BackendAndDatabaseManager/Dataset/data_type.dart';
@@ -18,11 +20,11 @@ class SelectConnection extends StatefulWidget {
   String extra;
   final MediaTypes mediaType;
   String textContent;
-  File mediaFile;
+  File? mediaFile;
 
   SelectConnection({
     this.extra='',
-    @required this.mediaType,
+    required this.mediaType,
     this.textContent = '',
     this.mediaFile,
   });
@@ -37,7 +39,7 @@ class _SelectConnectionState extends State<SelectConnection> {
   int _totalSelected = 0;
   final FToast _fToast = FToast();
 
-  List<bool> _selectedTile;
+  late List<bool> _selectedTile;
 
   final List<Map<String, String>> allConnectionsUserNameAndProfilePicture = [];
   final LocalStorageHelper _localStorageHelper = LocalStorageHelper();
@@ -51,7 +53,7 @@ class _SelectConnectionState extends State<SelectConnection> {
       setState(() {
         userNameList.forEach((userNameMap) {
           allConnectionsUserNameAndProfilePicture.add({
-            userNameMap.values.first: 'assets/logo/logo.jpg',
+            userNameMap.values.first.toString(): 'assets/logo/logo.jpg',
           });
         });
 
@@ -219,7 +221,7 @@ class _SelectConnectionState extends State<SelectConnection> {
             this.allConnectionsUserNameAndProfilePicture[currIndex].keys.first);
     }
 
-    GeneralMessage _generalMessage;
+    late GeneralMessage _generalMessage;
 
     switch (widget.mediaType) {
       case MediaTypes.Voice:
@@ -228,7 +230,7 @@ class _SelectConnectionState extends State<SelectConnection> {
 
         _generalMessage = GeneralMessage(
           sendMessage: _voiceDownloadUrl,
-          storeMessage: widget.mediaFile.path,
+          storeMessage: widget.mediaFile!.path,
           sendTime:
               '${DateTime.now().hour}:${DateTime.now().minute}+${widget.mediaType}+${widget.extra}+multipleConnectionSource',
           storeTime: '${DateTime.now().hour}:${DateTime.now().minute}',
@@ -247,7 +249,7 @@ class _SelectConnectionState extends State<SelectConnection> {
 
         _generalMessage = GeneralMessage(
             sendMessage: _imageDownLoadUrl,
-            storeMessage: widget.mediaFile.path,
+            storeMessage: widget.mediaFile!.path,
             sendTime:
                 '${DateTime.now().hour}:${DateTime.now().minute}+${widget.mediaType}+${widget.textContent}+multipleConnectionSource',
             storeTime:
@@ -266,15 +268,15 @@ class _SelectConnectionState extends State<SelectConnection> {
         final String _videoDownLoadUrl = await _management.uploadMediaToStorage(
             widget.mediaFile, this.context);
 
-        final Directory directory = await getExternalStorageDirectory();
+        final Directory? directory = await getExternalStorageDirectory();
 
         final Directory _newDirectory =
-            await Directory('${directory.path}/.ThumbNails/')
+            await Directory('${directory!.path}/.ThumbNails/')
                 .create(); // Create New Folder about the desire location;
 
         thumbNailPicturePath = await Thumbnails.getThumbnail(
             thumbnailFolder: _newDirectory.path,
-            videoFile: widget.mediaFile.path,
+            videoFile: widget.mediaFile!.path,
             imageType: ThumbFormat.JPEG,
             quality: 20);
 
@@ -283,7 +285,7 @@ class _SelectConnectionState extends State<SelectConnection> {
 
         _generalMessage = GeneralMessage(
             sendMessage: '$_videoDownLoadUrl+$thumbNailPicturePathUrl',
-            storeMessage: widget.mediaFile.path,
+            storeMessage: widget.mediaFile!.path,
             sendTime:
                 '${DateTime.now().hour}:${DateTime.now().minute}+${widget.mediaType}+${widget.textContent}+multipleConnectionSource',
             storeTime:
@@ -330,7 +332,7 @@ class _SelectConnectionState extends State<SelectConnection> {
 
         _generalMessage = GeneralMessage(
             sendMessage: _documentDownLoadUrl,
-            storeMessage: widget.mediaFile.path,
+            storeMessage: widget.mediaFile!.path,
             sendTime:
                 '${DateTime.now().hour}:${DateTime.now().minute}+${widget.mediaType}+${widget.textContent}+${widget.extra}+multipleConnectionSource',
             storeTime:

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -36,20 +35,22 @@ class LocalStorageHelper {
   final String _colLinks = 'New_Link';
 
   /// Create Singleton Objects(Only Created once in the whole application)
-  static LocalStorageHelper _localStorageHelper;
-  static Database _database;
+  static late LocalStorageHelper _localStorageHelper;
+  static late Database _database;
 
   /// Instantiate the obj
   LocalStorageHelper._createInstance();
 
   /// For access Singleton object
   factory LocalStorageHelper() {
+    // ignore: unnecessary_null_comparison
     if (_localStorageHelper == null)
       _localStorageHelper = LocalStorageHelper._createInstance();
     return _localStorageHelper;
   }
 
   Future<Database> get database async {
+    // ignore: unnecessary_null_comparison
     if (_database == null) _database = await initializeDatabase();
     return _database;
   }
@@ -58,8 +59,8 @@ class LocalStorageHelper {
   Future<Database> initializeDatabase() async {
     /// Get the directory path to store the database
 
-    final Directory directory = await getExternalStorageDirectory();
-    print('Directory Path: ${directory.path}');
+    final Directory? directory = await getExternalStorageDirectory();
+    print('Directory Path: ${directory!.path}');
 
     final Directory newDirectory =
         await Directory(directory.path + '/.Databases/').create();
@@ -82,9 +83,9 @@ class LocalStorageHelper {
   }
 
   Future<void> insertDataForThisAccount(
-      {@required String userName,
-      @required String userMail,
-      @required String userToken}) async {
+      {required String? userName,
+      required String? userMail,
+      required String? userToken}) async {
     Database db = await this.database;
     Map<String, dynamic> _accountData = Map<String, dynamic>();
 
@@ -95,49 +96,49 @@ class LocalStorageHelper {
     await db.insert(_allImportantDataStore, _accountData);
   }
 
-  Future<String> extractImportantDataFromThatAccount(
-      {String userName = '', String userMail = ''}) async {
+  Future<String?> extractImportantDataFromThatAccount(
+      {String? userName = '', String? userMail = ''}) async {
     Database db = await this.database;
 
-    List<Map<String, Object>> result = [];
+    List<Map<String, Object>>? result = [];
 
     if (userMail != '')
-      result = await db.rawQuery(
-          "SELECT $_colAccountUserName FROM $_allImportantDataStore WHERE $_colAccountUserMail = '$userMail'");
+      result = (await db.rawQuery(
+          "SELECT $_colAccountUserName FROM $_allImportantDataStore WHERE $_colAccountUserMail = '$userMail'")).cast<Map<String, Object>>();
     else
-      result = await db.rawQuery(
-          "SELECT $_colAccountUserMail FROM $_allImportantDataStore WHERE $_colAccountUserName = '$userName'");
+      result = (await db.rawQuery(
+          "SELECT $_colAccountUserMail FROM $_allImportantDataStore WHERE $_colAccountUserName = '$userName'")).cast<Map<String, Object>>();
 
-    return result[0].values.first;
+    return result[0].values.first.toString();
   }
 
   Future<String> extractToken(
       {String userMail = '', String userName = ''}) async {
     final Database db = await this.database;
 
-    List<Map<String, Object>> result;
+    List<Map<String, Object>>? result;
 
     if (userMail != '')
-      result = await db.rawQuery(
-          "SELECT $_colToken FROM $_allImportantDataStore WHERE $_colAccountUserMail = '$userMail'");
+      result = (await db.rawQuery(
+          "SELECT $_colToken FROM $_allImportantDataStore WHERE $_colAccountUserMail = '$userMail'")).cast<Map<String, Object>>();
     else
-      result = await db.rawQuery(
-          "SELECT $_colToken FROM $_allImportantDataStore WHERE $_colAccountUserName = '$userName'");
+      result = (await db.rawQuery(
+          "SELECT $_colToken FROM $_allImportantDataStore WHERE $_colAccountUserName = '$userName'")).cast<Map<String, Object>>();
 
-    return result[0].values.first;
+    return result[0].values.first.toString();
   }
 
   Future<List<Map<String, Object>>> extractAllUsersName(
       {bool thisAccountAllowed = false}) async {
     Database db = await this.database;
-    List<Map<String, Object>> result;
+    List<Map<String, Object>>? result;
 
     if (!thisAccountAllowed)
-      result = await db.rawQuery(
-          "SELECT $_colAccountUserName FROM $_allImportantDataStore WHERE $_colAccountUserMail != '${FirebaseAuth.instance.currentUser.email}'");
+      result = (await db.rawQuery(
+          "SELECT $_colAccountUserName FROM $_allImportantDataStore WHERE $_colAccountUserMail != '${FirebaseAuth.instance.currentUser!.email}'")).cast<Map<String, Object>>();
     else
-      result = await db
-          .rawQuery("SELECT $_colAccountUserName FROM $_allImportantDataStore");
+      result = (await db
+          .rawQuery("SELECT $_colAccountUserName FROM $_allImportantDataStore")).cast<Map<String, Object>>();
     return result;
   }
 
@@ -170,11 +171,11 @@ class LocalStorageHelper {
 
   /// Insert ActivityData to Activity Table
   Future<void> insertDataInUserActivityTable(
-      {@required String tableName,
-      @required String statusLinkOrString,
-      MediaTypes mediaTypes,
-      @required String activityTime,
-      ActivitySpecialOptions activitySpecialOptions,
+      {required String? tableName,
+      required String? statusLinkOrString,
+      MediaTypes? mediaTypes,
+      required String? activityTime,
+      ActivitySpecialOptions? activitySpecialOptions,
       String extraText = '',
       String bgInformation = ''}) async {
     final Database db = await this.database;
@@ -194,11 +195,11 @@ class LocalStorageHelper {
   }
 
   /// Extract Status from Table Name
-  Future<List<Map<String, dynamic>>> extractActivityForParticularUserName(
+  Future<List<Map<String, dynamic>>?> extractActivityForParticularUserName(
       String tableName) async {
     try {
       final Database db = await this.database;
-      final List<Map<String, Object>> tables =
+      final List<Map<String, Object?>> tables =
           await db.rawQuery("SELECT * FROM ${tableName}_status");
       return tables;
     } catch (e) {
@@ -209,7 +210,7 @@ class LocalStorageHelper {
 
   /// Delete Particular Activity record From Activity Container
   Future<void> deleteParticularActivity(
-      {@required String tableName, @required String activity}) async {
+      {required String? tableName, required String? activity}) async {
     try {
       final Database db = await this.database;
 
@@ -226,7 +227,7 @@ class LocalStorageHelper {
 
   /// For Debugging Purpose
   Future<void> showParticularUserAllActivity(
-      {@required String tableName}) async {
+      {required String? tableName}) async {
     try {
       final Database db = await this.database;
       var take = await db.rawQuery("SELECT * FROM ${tableName}_status");
@@ -241,20 +242,20 @@ class LocalStorageHelper {
   Future<int> countTotalActivitiesForParticularUserName(
       String tableName) async {
     final Database db = await this.database;
-    final List<Map<String, Object>> countTotalStatus =
+    final List<Map<String, Object?>> countTotalStatus =
         await db.rawQuery('SELECT COUNT(*) FROM ${tableName}_status');
 
-    return countTotalStatus[0].values.first;
+    return int.parse(countTotalStatus[0].values.first.toString());
   }
 
   /// Count total Messages for particular Table Name
-  Future<int> _countTotalMessagesUnderATable(String _tableName) async {
+  Future<int?> _countTotalMessagesUnderATable(String _tableName) async {
     final Database db = await this.database;
 
-    final List<Map<String, Object>> countTotalMessagesWithOneAdditionalData =
+    final List<Map<String, Object?>> countTotalMessagesWithOneAdditionalData =
         await db.rawQuery('SELECT COUNT(*) FROM $_tableName');
 
-    return countTotalMessagesWithOneAdditionalData[0].values.first;
+    return int.parse(countTotalMessagesWithOneAdditionalData[0].values.first.toString());
   }
 
   /// Insert Use Additional Data to Table
@@ -280,8 +281,8 @@ class LocalStorageHelper {
   }
 
   /// Insert New Messages to Table
-  Future<int> insertNewMessages(String _tableName, String _newMessage,
-      MediaTypes _currMediaType, int _ref, String _time) async {
+  Future<int> insertNewMessages(String? _tableName, String? _newMessage,
+      MediaTypes? _currMediaType, int? _ref, String? _time) async {
     Database db = await this.database; // DB Reference
     Map<String, dynamic> _helperMap =
         Map<String, dynamic>(); // Map to insert data
@@ -302,7 +303,7 @@ class LocalStorageHelper {
     _helperMap[_colEmail] = "";
 
     /// Result Insert to DB
-    var result = await db.insert(_tableName, _helperMap);
+    var result = await db.insert(_tableName!, _helperMap);
     print(result);
 
     return result;
@@ -313,32 +314,29 @@ class LocalStorageHelper {
       String _tableName) async {
     Database db = await this.database; // DB Reference
 
-    List<Map<String, Object>> result = await db.rawQuery(
+    List<Map<String, Object?>> result = await db.rawQuery(
         'SELECT $_colMessages, $_colTime, $_colReferences, $_colMediaType FROM $_tableName WHERE $_colReferences != -1');
 
     return result;
   }
 
-  Future<Map<String, String>> fetchLatestMessage(String _tableName) async {
+  Future<Map<String, String>?> fetchLatestMessage(String _tableName) async {
     final Database db = await this.database;
 
-    final int totalMessages = await _countTotalMessagesUnderATable(_tableName);
+    final int? totalMessages = await _countTotalMessagesUnderATable(_tableName);
 
     if (totalMessages == 1) return null;
 
-    final List<Map<String, Object>> result =
-        await db.transaction<List<Map<String, Object>>>((txn) {
-      print('txn: $txn');
-      return txn.rawQuery(
-          "SELECT $_colMessages, $_colMediaType, $_colTime FROM $_tableName LIMIT 1 OFFSET ${totalMessages - 1}");
-    });
+    final List<Map<String, Object?>> result = db.rawQuery(
+          "SELECT $_colMessages, $_colMediaType, $_colTime FROM $_tableName LIMIT 1 OFFSET ${totalMessages! - 1}") as List<Map<String, Object?>>;
+
 
     final String _time = result[0][_colTime].toString().split('+')[0];
 
     final Map<String, String> map = Map<String, String>();
 
     map.addAll({
-      result[0][_colMessages]: '$_time+${result[0][_colMediaType]}+localDb',
+      result[0][_colMessages].toString(): '$_time+${result[0][_colMediaType]}+localDb',
     });
 
     print('Map is: $map');
@@ -356,7 +354,7 @@ class LocalStorageHelper {
   }
 
   Future<void> insertNewLinkInLinkRemainingTable(
-      {@required String link}) async {
+      {required String link}) async {
     try {
       final Database db = await this.database;
 
@@ -379,7 +377,7 @@ class LocalStorageHelper {
     try {
       final Database db = await this.database;
 
-      final List<Map<String, Object>> result = await db.rawQuery(
+      final List<Map<String, Object?>> result = await db.rawQuery(
           'SELECT * FROM $_allRemainingLinksToDeleteFromFirebaseStorage');
 
       final Map<String, String> map = Map<String, String>();
@@ -398,7 +396,7 @@ class LocalStorageHelper {
   }
 
   Future<void> deleteRemainingLinksFromLocalStore(
-      {@required String link}) async {
+      {required String? link}) async {
     try {
       final Database db = await this.database;
 

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 
 import 'package:generation_official/BackendAndDatabaseManager/firebase_services/firestore_management.dart';
@@ -13,10 +14,10 @@ import 'package:photo_view/photo_view.dart';
 class PreviewImageScreen extends StatefulWidget {
   final File imageFile;
   String purpose;
-  final List<String> allConnectionUserName;
+  final List<String>? allConnectionUserName;
 
   PreviewImageScreen(
-      {@required this.imageFile,
+      {required this.imageFile,
       this.purpose = 'contacts',
       this.allConnectionUserName});
 
@@ -26,7 +27,7 @@ class PreviewImageScreen extends StatefulWidget {
 
 class _PreviewImageScreenState extends State<PreviewImageScreen> {
   bool _isLoading = false;
-  FToast fToast;
+  late FToast fToast;
 
   final TextEditingController manuallyTextController = TextEditingController();
   final Management management = Management();
@@ -126,7 +127,7 @@ class _PreviewImageScreenState extends State<PreviewImageScreen> {
                     radius: Radius.circular(30.0),
                     child: TextFormField(
                       validator: (inputValue) {
-                        if (inputValue.contains('++++++')) {
+                        if (inputValue!.contains('++++++')) {
                           return "'++++++' pattern not supported";
                         }
                         return null;
@@ -159,7 +160,7 @@ class _PreviewImageScreenState extends State<PreviewImageScreen> {
               child: FloatingActionButton(
                 backgroundColor: Colors.green,
                 onPressed: () async {
-                  if (_imagePreviewKey.currentState.validate()) {
+                  if (_imagePreviewKey.currentState!.validate()) {
                     SystemChannels.textInput.invokeMethod('TextInput.hide');
 
                     if (mounted) {

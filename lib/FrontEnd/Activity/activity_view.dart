@@ -5,19 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_icons/flutter_icons.dart';
-import 'package:generation_official/BackendAndDatabaseManager/firebase_services/firestore_management.dart';
 import 'package:photo_view/photo_view.dart';
+// ignore: import_of_legacy_library_into_null_safe
+import 'package:polls/polls.dart';
 
 import 'package:generation_official/BackendAndDatabaseManager/Dataset/data_type.dart';
 import 'package:generation_official/BackendAndDatabaseManager/sqlite_services/local_storage_controller.dart';
 import 'package:generation_official/FrontEnd/Activity/animation_controller.dart';
-import 'package:polls/polls.dart';
+
 
 class ActivityView extends StatefulWidget {
   final String takeParticularConnectionUserName;
 
-  ActivityView({@required this.takeParticularConnectionUserName});
+  ActivityView({required this.takeParticularConnectionUserName});
 
   @override
   _ActivityViewState createState() => _ActivityViewState();
@@ -31,7 +31,7 @@ class _ActivityViewState extends State<ActivityView>
 
   final LocalStorageHelper _localStorageHelper = LocalStorageHelper();
 
-  String _pollingQuestion;
+  late String _pollingQuestion;
   final List<Map<String, int>> _pollingOptions = [];
 
   Map<String, dynamic> _pollMapIndependent = Map<String, dynamic>();
@@ -39,8 +39,8 @@ class _ActivityViewState extends State<ActivityView>
 
   // Important Controller for Activity View
   //VideoPlayerController _videoController;
-  PageController _activityPageViewController;
-  AnimationController _animationController;
+  late PageController _activityPageViewController;
+  late AnimationController _animationController;
 
   // Will Take all Activity Collection of Current User
   List<dynamic> _currUserActivityCollection = [];
@@ -69,7 +69,7 @@ class _ActivityViewState extends State<ActivityView>
   }
 
   void _collectCurrUserActivity() async {
-    final List<Map<String, dynamic>> _activityDataCollect =
+    final List<Map<String, dynamic>>? _activityDataCollect =
         await _localStorageHelper.extractActivityForParticularUserName(
             widget.takeParticularConnectionUserName);
 
@@ -100,44 +100,41 @@ class _ActivityViewState extends State<ActivityView>
   @override
   void initState() {
     /// If Have Some Activity of Current User
-    if (widget.takeParticularConnectionUserName != null) {
-      _collectCurrUserActivity();
+    _collectCurrUserActivity();
 
-      SystemChrome.setEnabledSystemUIOverlays([]); // Android StatusBar Hide
+    SystemChrome.setEnabledSystemUIOverlays([]); // Android StatusBar Hide
 
-      // For EveryActivity Controller and EveryActivity Animation Controller
-      _activityPageViewController = PageController();
-      _animationController = AnimationController(vsync: this);
+    // For EveryActivity Controller and EveryActivity Animation Controller
+    _activityPageViewController = PageController();
+    _animationController = AnimationController(vsync: this);
 
-      // Animation Status Initialized with Add Listner Mode
-      _animationController.addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          _animationController.stop();
-          _animationController.reset();
-          if (mounted) {
-            setState(() {
-              if (_activityCurrIndex + 1 < _currUserActivityCollection.length) {
-                _activityCurrIndex += 1;
-                _callLoader(activityPosition: _activityCurrIndex);
-              } else {
-                /// Code For Debugging Purpose
-                // _activityCurrIndex = 0; // When All Status Over
-                // _callLoader(activityPosition: _activityCurrIndex);
+    // Animation Status Initialized with Add Listner Mode
+    _animationController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _animationController.stop();
+        _animationController.reset();
+        if (mounted) {
+          setState(() {
+            if (_activityCurrIndex + 1 < _currUserActivityCollection.length) {
+              _activityCurrIndex += 1;
+              _callLoader(activityPosition: _activityCurrIndex);
+            } else {
+              /// Code For Debugging Purpose
+              // _activityCurrIndex = 0; // When All Status Over
+              // _callLoader(activityPosition: _activityCurrIndex);
 
-                Navigator.pop(context);
-              }
-            });
-          }
+              Navigator.pop(context);
+            }
+          });
         }
-      });
-    }
+      }
+    });
     super.initState();
   }
 
   @override
   void dispose() {
-    if (widget.takeParticularConnectionUserName != null &&
-        _currUserActivityCollection.length > 0) {
+    if (_currUserActivityCollection.length > 0) {
       // Some Controller Dispose else may give error after current context getting pop
       //_videoController?.dispose();
       _animationController.dispose();
@@ -455,7 +452,7 @@ class _ActivityViewState extends State<ActivityView>
       print("Now Work For OnTapUp and OnTapDown");
     } else {
       setState(() {
-        if (details.primaryVelocity > 0) {
+        if (details.primaryVelocity! > 0) {
           if (_activityCurrIndex - 1 >= 0) {
             _activityCurrIndex -= 1;
           }
@@ -515,7 +512,8 @@ class _ActivityViewState extends State<ActivityView>
   }
 
   Widget pollActivityView(String _pollId) {
-    return _pollingOptions != null && _pollingQuestion != null
+    // ignore: unnecessary_null_comparison
+    return _pollingQuestion != null
         ? Container(
             width: double.maxFinite,
             height: double.maxFinite,
@@ -567,7 +565,7 @@ class _ActivityViewState extends State<ActivityView>
       });
     }
 
-    final String _connectedUserEmail =
+    final String? _connectedUserEmail =
         await _localStorageHelper.extractImportantDataFromThatAccount(
             userName: widget.takeParticularConnectionUserName);
 
@@ -584,7 +582,7 @@ class _ActivityViewState extends State<ActivityView>
 
     if (mounted) {
       setState(() {
-        _pollMapIndependent = documentSnapshot.data();
+        _pollMapIndependent = documentSnapshot.data()!;
 
         _pollMapIndependent.forEach((key, value) {
           if (key == 'question')

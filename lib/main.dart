@@ -10,8 +10,6 @@ import 'package:generation_official/FrontEnd/Auth_UI/sign_up_UI.dart';
 import 'package:generation_official/BackendAndDatabaseManager/firebase_services/google_auth.dart';
 import 'package:generation_official/BackendAndDatabaseManager/general_services/notification_configuration.dart';
 
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -25,11 +23,11 @@ void main() async {
   /// For Foreground Message Handling
   FirebaseMessaging.onMessage.listen((messageEvent) {
     print(
-        'Message Data is: ${messageEvent.notification.title}      ${messageEvent.notification.body}');
+        'Message Data is: ${messageEvent.notification!.title}      ${messageEvent.notification!.body}');
 
     _receiveAndShowNotificationInitialization(
-      title: messageEvent.notification.title,
-      body: messageEvent.notification.body,
+      title: messageEvent.notification!.title,
+      body: messageEvent.notification!.body,
     );
   }, onDone: () => print('Done'), onError: (e) => print('Error: $e'));
 
@@ -47,7 +45,7 @@ void main() async {
 
 /// Receive And Show Notification Customization
 void _receiveAndShowNotificationInitialization(
-    {@required String title, @required String body}) async {
+    {required String? title, required String? body}) async {
   final ForeGroundNotificationReceiveAndShow
       _foregroundNotificationReceiveAndShow =
       ForeGroundNotificationReceiveAndShow();
@@ -76,7 +74,7 @@ Future<void> notificationInitialize() async {
 /// Background Message Show for Debugging
 Future<void> backgroundMsgAction(RemoteMessage message) async {
   print(
-      'Background Message Data: ${message.notification.body}   ${message.notification.title}');
+      'Background Message Data: ${message.notification!.body}   ${message.notification!.title}');
 }
 
 /// Decide to Switch to widget based of current Scenario
@@ -85,7 +83,7 @@ Future<Widget> differentContext() async {
 
   try {
     final DocumentSnapshot responseData = await FirebaseFirestore.instance
-        .doc("generation_users/${FirebaseAuth.instance.currentUser.email}")
+        .doc("generation_users/${FirebaseAuth.instance.currentUser!.email}")
         .get();
 
     print(responseData.exists);

@@ -36,7 +36,7 @@ class GoogleAuth {
               await FirebaseAuth.instance.signInWithCredential(oAuthCredential);
 
           DocumentSnapshot responseData = await FirebaseFirestore.instance
-              .doc("generation_users/${userCredential.user.email}")
+              .doc("generation_users/${userCredential.user!.email}")
               .get();
 
           print(responseData.exists);
@@ -52,7 +52,7 @@ class GoogleAuth {
 
           if (!responseData.exists) {
             print("Email Not Present");
-            await userNameChecking(context, userCredential.user.email);
+            await userNameChecking(context, userCredential.user!.email);
           } else {
             Navigator.pop(context);
             Navigator.push(
@@ -107,7 +107,7 @@ class GoogleAuth {
             ));
   }
 
-  Future<void> userNameChecking(BuildContext context, String _email) async {
+  Future<void> userNameChecking(BuildContext context, String? _email) async {
     showDialog(
         context: context,
         builder: (_) => AlertDialog(
@@ -130,7 +130,7 @@ class GoogleAuth {
                         controller: _userName,
                         style: TextStyle(color: Colors.white),
                         validator: (inputUserName) {
-                          if (inputUserName.length < 6)
+                          if (inputUserName!.length < 6)
                             return "User Name At Least 6 Characters";
                           else if (inputUserName.contains(' ') ||
                               inputUserName.contains('@'))
@@ -154,7 +154,7 @@ class GoogleAuth {
                         controller: _about,
                         style: TextStyle(color: Colors.white),
                         validator: (inputUserName) {
-                          if (inputUserName.length < 6)
+                          if (inputUserName!.length < 6)
                             return "About Should be At Least 6 Characters";
                           return null;
                         },
@@ -183,7 +183,7 @@ class GoogleAuth {
                                 TextStyle(fontSize: 18.0, color: Colors.white),
                           ),
                           onPressed: () async {
-                            if (_userNameKey.currentState.validate()) {
+                            if (_userNameKey.currentState!.validate()) {
                               print("ok");
 
                               QuerySnapshot querySnapShotForUserNameChecking =
@@ -197,7 +197,7 @@ class GoogleAuth {
 
                               if (querySnapShotForUserNameChecking
                                   .docs.isEmpty) {
-                                final String _getToken =
+                                final String? _getToken =
                                     await FirebaseMessaging.instance.getToken();
 
                                 FirebaseFirestore.instance
@@ -223,7 +223,7 @@ class GoogleAuth {
                                 await _localStorageHelper
                                     .insertDataForThisAccount(
                                   userMail:
-                                      FirebaseAuth.instance.currentUser.email,
+                                      FirebaseAuth.instance.currentUser!.email,
                                   userName: this._userName.text,
                                   userToken: _getToken,
                                 );

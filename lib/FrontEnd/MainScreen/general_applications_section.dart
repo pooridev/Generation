@@ -3,8 +3,9 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:circle_list/circle_list.dart';
-import 'package:flutter/services.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:generation_official/BackendAndDatabaseManager/Dataset/data_type.dart';
 import 'package:generation_official/FrontEnd/Services/multiple_message_send_connection_selection.dart';
@@ -189,19 +190,18 @@ class _ApplicationListState extends State<ApplicationList> {
   }
 
   void _imageOrVideoSend(
-      {@required ImageSource imageSource, String type = 'image'}) async {
+      {required ImageSource imageSource, String type = 'image'}) async {
     PickedFile pickedFile;
     type == 'image'
         ? pickedFile =
-            await picker.getImage(source: imageSource, imageQuality: 50)
-        : pickedFile = await picker.getVideo(
-            source: imageSource, maxDuration: Duration(seconds: 15));
+            (await picker.getImage(source: imageSource, imageQuality: 50))!
+        : pickedFile = (await picker.getVideo(
+            source: imageSource, maxDuration: Duration(seconds: 15)))!;
 
-    if (pickedFile != null)
-      _extraTextManagement(
-        type == 'image' ? MediaTypes.Image : MediaTypes.Video,
-        file: File(pickedFile.path),
-      );
+    _extraTextManagement(
+      type == 'image' ? MediaTypes.Image : MediaTypes.Video,
+      file: File(pickedFile.path),
+    );
   }
 
   Future<void> _documentSend() async {
@@ -218,7 +218,7 @@ class _ApplicationListState extends State<ApplicationList> {
     ];
 
     try {
-      final FilePickerResult filePickerResult =
+      final FilePickerResult? filePickerResult =
           await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: _allowedExtensions,
@@ -231,7 +231,7 @@ class _ApplicationListState extends State<ApplicationList> {
             _extraTextManagement(
               MediaTypes.Document,
               extension: '.${file.extension}',
-              file: File(file.path),
+              file: File(file.path.toString()),
             );
           else {
             _showDiaLog(
@@ -311,7 +311,7 @@ class _ApplicationListState extends State<ApplicationList> {
       'ogg',
     ];
 
-    final FilePickerResult _audioFilePickerResult =
+    final FilePickerResult? _audioFilePickerResult =
         await FilePicker.platform.pickFiles(
       type: FileType.audio,
     );
@@ -326,7 +326,7 @@ class _ApplicationListState extends State<ApplicationList> {
             MaterialPageRoute(
                 builder: (_) => SelectConnection(
                       mediaType: MediaTypes.Voice,
-                      mediaFile: File(element.path),
+                      mediaFile: File(element.path.toString()),
                       extra: _allowedExtensions.contains(element.extension)
                           ? '.${element.extension}'
                           : '.mp3',
@@ -336,7 +336,7 @@ class _ApplicationListState extends State<ApplicationList> {
   }
 
   void _extraTextManagement(MediaTypes mediaTypes,
-      {String extension = '', File file}) {
+      {String extension = '', File? file}) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -409,7 +409,7 @@ class _ApplicationListState extends State<ApplicationList> {
     );
   }
 
-  void _showDiaLog({@required String titleText, String contentText = ''}) {
+  void _showDiaLog({required String titleText, String contentText = ''}) {
     showDialog(
         context: context,
         builder: (_) => AlertDialog(

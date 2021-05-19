@@ -72,7 +72,7 @@ Future<void> _deleteOldTask(bool response) async {
     print('Delete Activity Executing 2: $_connectionUserName');
 
     _connectionUserName.forEach((everyUser) async {
-      final List<Map<String, dynamic>> _thisUserActivityCollection =
+      final List<Map<String, dynamic>>? _thisUserActivityCollection =
           await _localStorageHelper
               .extractActivityForParticularUserName(everyUser.values.first);
 
@@ -160,7 +160,7 @@ Future<void> _deleteOldTask(bool response) async {
     final int currHour = DateTime.now().hour;
     final int currMinute = DateTime.now().minute;
 
-    if (_linksMap != null && _linksMap.length > 0) {
+    if (_linksMap.length > 0) {
       _linksMap.forEach((_link, _time) async {
         final List<String> _timeDistribution = _time.split(' ')[1].split(':');
 

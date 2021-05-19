@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:generation_official/BackendAndDatabaseManager/firebase_services/firestore_management.dart';
@@ -126,7 +127,7 @@ class _PollMakerState extends State<PollMaker> {
   }
 
   Widget optionsMaintain(
-      {@required IconData iconData, @required Color iconColor}) {
+      {required IconData iconData, required Color iconColor}) {
     return Center(
       child: GestureDetector(
         child: Container(
@@ -224,7 +225,7 @@ class _PollMakerState extends State<PollMaker> {
             ));
   }
 
-  Widget _pollingAlertDialogButtons({@required String buttonName}) {
+  Widget _pollingAlertDialogButtons({required String buttonName}) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
           primary: buttonName == 'Save' ? Colors.green : Colors.red,
@@ -241,7 +242,7 @@ class _PollMakerState extends State<PollMaker> {
             element.clear();
           });
         } else {
-          if (this._pollFormKey.currentState.validate()) {
+          if (this._pollFormKey.currentState!.validate()) {
             print('Validate');
 
             final Map<String, dynamic> _pollMap = Map<String, dynamic>();
@@ -271,14 +272,14 @@ class _PollMakerState extends State<PollMaker> {
   }
 
   Widget answersSection(
-      {@required String labelText,
-      @required TextEditingController textEditingController,
+      {required String labelText,
+      required TextEditingController textEditingController,
       @required index}) {
     return TextFormField(
       controller: textEditingController,
       style: TextStyle(color: Colors.white),
       validator: (inputUserName) {
-        if (inputUserName.length > 0) return null;
+        if (inputUserName!.length > 0) return null;
         if (index == 0) return 'Please Add a Question';
         return "Empty Option Can't be Accepted";
       },

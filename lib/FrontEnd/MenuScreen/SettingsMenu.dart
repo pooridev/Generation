@@ -45,7 +45,7 @@ class _SettingsWindowState extends State<SettingsWindow> {
                   "Theme",
                   "Dark",
                   "Light",
-                  Colors.purpleAccent[100],
+                  Colors.purpleAccent,
                   Colors.lightBlueAccent,
                   Icons.nights_stay_rounded,
                   Icons.wb_sunny_sharp,
@@ -138,17 +138,17 @@ class _SettingsWindowState extends State<SettingsWindow> {
 
   Widget rowsTheme(
       BuildContext context,
-      String leftText,
-      String onText,
-      String offText,
+      String? leftText,
+      String? onText,
+      String? offText,
       Color onBgColor,
       Color offBgColor,
-      IconData onIcon,
-      IconData offIcon,
-      Color onCircleColor,
-      Color offCircleColor,
-      Color onIconColor,
-      Color offIconColor,
+      IconData? onIcon,
+      IconData? offIcon,
+      Color? onCircleColor,
+      Color? offCircleColor,
+      Color? onIconColor,
+      Color? offIconColor,
       Color onTextColor,
       Color offTextColor) {
     return Row(
@@ -158,7 +158,7 @@ class _SettingsWindowState extends State<SettingsWindow> {
             alignment: Alignment.center,
             //color: Colors.white,
             child: Text(
-              leftText,
+              leftText!,
               style: TextStyle(
                   color: Colors.black54,
                   fontSize: 20.0,
@@ -215,17 +215,17 @@ class _SettingsWindowState extends State<SettingsWindow> {
 
   Widget rowsNotification(
       BuildContext context,
-      String leftText,
-      String onText,
-      String offText,
+      String? leftText,
+      String? onText,
+      String? offText,
       Color onBgColor,
       Color offBgColor,
-      IconData onIcon,
-      IconData offIcon,
-      Color onCircleColor,
-      Color offCircleColor,
-      Color onIconColor,
-      Color offIconColor,
+      IconData? onIcon,
+      IconData? offIcon,
+      Color? onCircleColor,
+      Color? offCircleColor,
+      Color? onIconColor,
+      Color? offIconColor,
       Color onTextColor,
       Color offTextColor) {
     return Row(
@@ -235,7 +235,7 @@ class _SettingsWindowState extends State<SettingsWindow> {
             alignment: Alignment.center,
             //color: Colors.white,
             child: Text(
-              leftText,
+              leftText!,
               style: TextStyle(
                   color: Colors.black54,
                   fontSize: 20.0,

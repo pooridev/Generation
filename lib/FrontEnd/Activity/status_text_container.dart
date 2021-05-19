@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 
 import 'package:generation_official/BackendAndDatabaseManager/firebase_services/firestore_management.dart';
@@ -23,7 +24,7 @@ class _StatusTextContainerState extends State<StatusTextContainer> {
   final Management management = Management();
   TextEditingController activityText = TextEditingController();
   bool isLoading = false;
-  FToast fToast;
+  late FToast fToast;
 
   int _fontSizeController = 1;
 

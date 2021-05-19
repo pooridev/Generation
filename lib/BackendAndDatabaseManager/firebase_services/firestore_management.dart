@@ -14,12 +14,12 @@ import 'package:generation_official/FrontEnd/Auth_UI/sign_up_UI.dart';
 
 class Management {
   final LocalStorageHelper localStorageHelper = LocalStorageHelper();
-  String _currAccountUserName;
+  late String _currAccountUserName;
 
   _userNameExtractFromLocalDatabase() async {
     _currAccountUserName =
-    await localStorageHelper.extractImportantDataFromThatAccount(
-        userMail: FirebaseAuth.instance.currentUser.email);
+    (await localStorageHelper.extractImportantDataFromThatAccount(
+        userMail: FirebaseAuth.instance.currentUser!.email))!;
   }
 
   Management({bool takeTotalUserName = true}) {
@@ -64,7 +64,7 @@ class Management {
         .doc("generation_users/$_senderMail")
         .update({
       'connections': {
-        '${FirebaseAuth.instance.currentUser.email}': messageMap,
+        '${FirebaseAuth.instance.currentUser!.email}': messageMap,
       }
     });
   }
@@ -72,7 +72,7 @@ class Management {
   Stream<DocumentSnapshot> getDatabaseData() {
     final Stream<DocumentSnapshot> streamDocumentSnapShot = FirebaseFirestore
         .instance
-        .doc('generation_users/${FirebaseAuth.instance.currentUser.email}')
+        .doc('generation_users/${FirebaseAuth.instance.currentUser!.email}')
         .snapshots();
 
     return streamDocumentSnapShot;
@@ -97,7 +97,7 @@ class Management {
     if (allConnectionUserName.isNotEmpty) {
       try {
         allConnectionUserName.forEach((String connectionUserName) async {
-          String _userMail =
+          String? _userMail =
           await localStorageHelper.extractImportantDataFromThatAccount(
               userName: connectionUserName);
 
@@ -105,11 +105,12 @@ class Management {
               .doc('generation_users/$_userMail')
               .get();
 
-          Map<String, dynamic> activityCollection =
-          documentSnapshot.data()['activity'] as Map;
+          Map activityCollection =
+          documentSnapshot.data()!['activity'] as Map;
           List<dynamic> currConnection = activityCollection[
-          FirebaseAuth.instance.currentUser.email.toString()];
+          FirebaseAuth.instance.currentUser!.email.toString()];
 
+          // ignore: unnecessary_null_comparison
           if (currConnection == null) currConnection = [];
 
           currConnection.add({
@@ -118,7 +119,7 @@ class Management {
                 .blue}+${selectedBGColor.opacity}+$fontSize+$_currTime',
           });
 
-          activityCollection[FirebaseAuth.instance.currentUser.email
+          activityCollection[FirebaseAuth.instance.currentUser!.email
               .toString()] = currConnection;
 
           await FirebaseFirestore.instance
@@ -137,15 +138,15 @@ class Management {
       return true;
   }
 
-  Future<bool> mediaActivityToStorageAndFireStore(File imgFile,
+  Future<bool> mediaActivityToStorageAndFireStore(File? imgFile,
       String manuallyText,
-      List<String> allConnectionUserName,
+      List<String>? allConnectionUserName,
       BuildContext context,
       {String mediaType = 'image'}) async {
-    if (allConnectionUserName.isEmpty) {
+    if (allConnectionUserName!.isEmpty) {
       await localStorageHelper.insertDataInUserActivityTable(
         tableName: _currAccountUserName,
-        statusLinkOrString: imgFile.path,
+        statusLinkOrString: imgFile!.path,
         mediaTypes: MediaTypes.Image,
         activityTime: DateTime.now().toString(),
         extraText: manuallyText,
@@ -159,14 +160,14 @@ class Management {
 
         await localStorageHelper.insertDataInUserActivityTable(
           tableName: _currAccountUserName,
-          statusLinkOrString: '${imgFile.path}+$imageUrl',
+          statusLinkOrString: '${imgFile!.path}+$imageUrl',
           mediaTypes: MediaTypes.Image,
           activityTime: _currTime,
           extraText: manuallyText,
         );
 
         allConnectionUserName.forEach((String connectionUserName) async {
-          String _userMail =
+          String? _userMail =
           await localStorageHelper.extractImportantDataFromThatAccount(
               userName: connectionUserName);
 
@@ -174,18 +175,19 @@ class Management {
               .doc('generation_users/$_userMail')
               .get();
 
-          Map<String, dynamic> activityCollection =
-          documentSnapshot.data()['activity'] as Map;
+          Map activityCollection =
+          documentSnapshot.data()!['activity'] as Map;
           List<dynamic> currConnection = activityCollection[
-          FirebaseAuth.instance.currentUser.email.toString()];
+          FirebaseAuth.instance.currentUser!.email.toString()];
 
+          // ignore: unnecessary_null_comparison
           if (currConnection == null) currConnection = [];
 
           currConnection.add({
             imageUrl: '$manuallyText++++++$mediaType++++++$_currTime',
           });
 
-          activityCollection[FirebaseAuth.instance.currentUser.email
+          activityCollection[FirebaseAuth.instance.currentUser!.email
               .toString()] = currConnection;
 
           await FirebaseFirestore.instance
@@ -210,13 +212,13 @@ class Management {
     }
   }
 
-  Future<String> uploadMediaToStorage(File filePath,
+  Future<String> uploadMediaToStorage(File? filePath,
       BuildContext context) async {
     try {
-      String downLoadUrl;
+      late String downLoadUrl;
 
       final String fileName =
-          '${FirebaseAuth.instance.currentUser.uid}${DateTime
+          '${FirebaseAuth.instance.currentUser!.uid}${DateTime
           .now()
           .day}${DateTime
           .now()
@@ -235,7 +237,7 @@ class Management {
       final Reference firebaseStorageRef =
       FirebaseStorage.instance.ref().child(fileName);
 
-      final UploadTask uploadTask = firebaseStorageRef.putFile(filePath);
+      final UploadTask uploadTask = firebaseStorageRef.putFile(filePath!);
 
       await uploadTask.whenComplete(() async {
         print("Media Uploaded");
@@ -286,7 +288,7 @@ class Management {
   }
 
   Future<void> deleteParticularActivityLink(
-      {@required String fileName, @required String connectionMail}) async {
+      {@required String? fileName, @required String? connectionMail}) async {
     try {
       await FirebaseFirestore.instance
           .doc('generation_users/activity/$fileName')
@@ -296,7 +298,7 @@ class Management {
     }
   }
 
-  Future<String> addPollingToFireStore(Map<String, dynamic> map) async {
+  Future<String?> addPollingToFireStore(Map<String, dynamic> map) async {
     try {
       final DocumentReference documentReference = await FirebaseFirestore
           .instance
@@ -312,7 +314,7 @@ class Management {
   Future<void> addPollIdInLocalAndFireStore(
       Map<String, dynamic> _pollMap) async {
     try {
-      final String id = await addPollingToFireStore(_pollMap);
+      final String? id = await addPollingToFireStore(_pollMap);
 
       if (id != null) {
         final String _currTime = DateTime.now().toString();
@@ -326,10 +328,10 @@ class Management {
 
         final DocumentSnapshot documentSnapshot = await FirebaseFirestore
             .instance
-            .doc('generation_users/${FirebaseAuth.instance.currentUser.email}')
+            .doc('generation_users/${FirebaseAuth.instance.currentUser!.email}')
             .get();
         final Map<String, dynamic> _connectionsMap =
-        documentSnapshot.data()['connections'];
+        documentSnapshot.data()!['connections'];
 
         _connectionsMap
             .forEach((connectionUserName, connectionUserMessages) async {
@@ -337,18 +339,19 @@ class Management {
               .instance
               .doc('generation_users/$connectionUserName')
               .get();
-          final Map<String, dynamic> activityCollection = documentSnapshot.data()['activity'];
+          final Map<String, dynamic> activityCollection = documentSnapshot.data()!['activity'];
 
           List<dynamic> currConnection = activityCollection[
-          FirebaseAuth.instance.currentUser.email.toString()];
+          FirebaseAuth.instance.currentUser!.email.toString()];
 
+          // ignore: unnecessary_null_comparison
           if (currConnection == null) currConnection = [];
 
           currConnection.add({
             '$id+ActivitySpecialOptions.Polling': _currTime,
           });
 
-          activityCollection[FirebaseAuth.instance.currentUser.email.toString()] = currConnection;
+          activityCollection[FirebaseAuth.instance.currentUser!.email.toString()] = currConnection;
 
           await FirebaseFirestore.instance
               .doc('generation_users/$connectionUserName')

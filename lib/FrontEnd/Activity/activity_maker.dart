@@ -1,9 +1,10 @@
 import 'dart:io';
 
 import 'package:animations/animations.dart';
+
 import 'package:circle_list/circle_list.dart';
+
 import 'package:circle_list/radial_drag_gesture_detector.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:generation_official/FrontEnd/Activity/activity_multiple_options.dart';
@@ -14,8 +15,8 @@ import 'package:generation_official/FrontEnd/Preview/images_preview_screen.dart'
 
 
 activityList(
-    {@required BuildContext context,
-    @required List<String> allConnectionsUserName}) {
+    {required BuildContext context,
+    required List<String> allConnectionsUserName}) {
   return showDialog(
     context: context,
     builder: (context) => activityListOptions(context, allConnectionsUserName),
@@ -107,7 +108,7 @@ activityListOptions(BuildContext context, List<String> allConnectionsUserName) {
                     color: Colors.lightGreen,
                   ),
                   onTap: () async {
-                    final PickedFile pickedFile = await picker.getImage(
+                    final PickedFile? pickedFile = await picker.getImage(
                       source: ImageSource.camera,
                       imageQuality: 50,
                     );
@@ -130,7 +131,7 @@ activityListOptions(BuildContext context, List<String> allConnectionsUserName) {
                   onLongPress: () async {
                     print("Take Image");
 
-                    final PickedFile pickedFile = await picker.getImage(
+                    final PickedFile? pickedFile = await picker.getImage(
                         source: ImageSource.gallery, imageQuality: 50);
 
                     if (pickedFile != null) {
